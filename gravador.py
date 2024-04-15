@@ -1,36 +1,41 @@
-import pyaudio
 import wave
+import pyaudio
+import keyboard
+
+FRAMESPERBUFFER = 1024
+FORRMAT = pyaudio.paInt16
+CHANNELS = 1 #mono ou estéreo.
+RATE = 44100
 
 audio = pyaudio.PyAudio()
 
-FORRMAT = pyaudio.paInt32
-CHANNELS = 1
-RATE = 44000
-FRAMESPERBUFFER = 1024
-
 stream = audio.open(
     input=True, #Não é execução, é recepção.
-    format=FORRMAT, # 16 bits /paInt32 32 bits -> Quanto maior, maior a qualidade do áudio e maior o peso do arquivo. Mais detalhes
-    channels=CHANNELS, #mono ou estéreo.
-    rate=RATE, #44000 Hz
+    format=FORRMAT,
+    channels=CHANNELS,
+    rate=RATE,
     frames_per_buffer=FRAMESPERBUFFER,
 )
+print("Gravando... Pressione 'p' para parar.")
 
 frames = []
+while True:
+    buffer = stream.read(FRAMESPERBUFFER)
+    frames.append(buffer)
+    if keyboard.is_pressed('p'):
+        break
 
-try:
-    while True:
-        buffer = stream.read(FRAMESPERBUFFER)
-        frames.append(buffer)
-except KeyboardInterrupt:
-    pass
+print("Parando gravação...")
 
 stream.start_stream()
 stream.close()
 audio.terminate()
-arquivo_audio = wave.open("gravacao.mp3", "wb")
-arquivo_audio.setnchannels(CHANNELS)
-arquivo_audio.setframerate(RATE)
-arquivo_audio.setsampwidth(audio.get_sample_size(FORRMAT))
-arquivo_audio.writeframes(b"".join(frames))
-arquivo_audio.close()
+
+print("Gravação concluída.")
+
+waveform = wave.open("gravacao.mp3", "wb")
+waveform.setnchannels(CHANNELS)
+waveform.setframerate(RATE)
+waveform.setsampwidth(audio.get_sample_size(FORRMAT))
+waveform.writeframes(b"".join(frames))
+waveform.close()
