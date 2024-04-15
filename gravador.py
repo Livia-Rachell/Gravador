@@ -25,7 +25,8 @@ while True:
     if keyboard.is_pressed('p'):
         break
 
-print("Parando gravação...")
+nome_arquivo = input("Digite o nome do arquivo: ")
+nome_arquivo += ".wav"
 
 stream.start_stream()
 stream.close()
@@ -33,7 +34,7 @@ audio.terminate()
 
 print("Gravação concluída.")
 
-waveform = wave.open("gravacao.mp3", "wb")
+waveform = wave.open(nome_arquivo, "wb")
 waveform.setnchannels(CHANNELS)
 waveform.setframerate(RATE)
 waveform.setsampwidth(audio.get_sample_size(FORRMAT))
